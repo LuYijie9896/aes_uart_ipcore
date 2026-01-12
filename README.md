@@ -121,4 +121,4 @@ AES_UART/
 - 运行仿真前请确保仿真器支持 SystemVerilog。
 
 ---
-*Created by AES_UART Project Team*
+*Created by Easy*
