@@ -1,0 +1,385 @@
+{
+	"partitions" : [
+		{
+			"name" : "Top",
+			"pins" : [
+				{
+					"name" : "rd_axil.rdata[26]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[27]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[28]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[29]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[30]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[31]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.bvalid",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wready",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.awready",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rvalid",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[0]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[1]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[2]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[3]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[4]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[5]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[6]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[7]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[8]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[9]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[10]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[11]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[12]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[13]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[14]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[15]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[16]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[17]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[18]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[19]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[20]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[21]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[22]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[23]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[24]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rdata[25]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.arready",
+					"strict" : false
+				},
+				{
+					"name" : "Tx",
+					"strict" : false
+				},
+				{
+					"name" : "Clk",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.araddr[6]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.araddr[2]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.araddr[3]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.araddr[4]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.araddr[5]",
+					"strict" : false
+				},
+				{
+					"name" : "Rst",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.araddr[7]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.araddr[0]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.araddr[1]",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.rready",
+					"strict" : false
+				},
+				{
+					"name" : "rd_axil.arvalid",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.bready",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wvalid",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.awvalid",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[15]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.awaddr[3]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.awaddr[2]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.awaddr[4]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.awaddr[7]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.awaddr[0]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.awaddr[1]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.awaddr[6]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.awaddr[5]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[26]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[27]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[28]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[29]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[30]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[31]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[0]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[1]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[2]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[3]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[4]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[5]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[6]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[7]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[8]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[9]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[10]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[11]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[12]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[13]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[14]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[16]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[17]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[18]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[19]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[20]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[21]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[22]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[23]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[24]",
+					"strict" : false
+				},
+				{
+					"name" : "wr_axil.wdata[25]",
+					"strict" : false
+				},
+				{
+					"name" : "Rx",
+					"strict" : false
+				}
+			]
+		}
+	]
+}

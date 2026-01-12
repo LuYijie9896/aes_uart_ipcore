@@ -1,0 +1,28 @@
+
+State Machine - |AES_UART|InvAESCipher:inv_aes_cipher_inst|StateReg
+Name StateReg.OUTPUT StateReg.S2 StateReg.S1 StateReg.S0 StateReg.KEY_GEN StateReg.INPUT StateReg.IDLE 
+StateReg.IDLE 0 0 0 0 0 0 0 
+StateReg.INPUT 0 0 0 0 0 1 1 
+StateReg.KEY_GEN 0 0 0 0 1 0 1 
+StateReg.S0 0 0 0 1 0 0 1 
+StateReg.S1 0 0 1 0 0 0 1 
+StateReg.S2 0 1 0 0 0 0 1 
+StateReg.OUTPUT 1 0 0 0 0 0 1 
+
+State Machine - |AES_UART|uart:uart_inst|uart_rx:uart_rx_inst|state_reg
+Name state_reg.STATE_WAIT_STOP state_reg.STATE_STOP state_reg.STATE_PARITY state_reg.STATE_DATA state_reg.STATE_START state_reg.STATE_IDLE 
+state_reg.STATE_IDLE 0 0 0 0 0 0 
+state_reg.STATE_START 0 0 0 0 1 1 
+state_reg.STATE_DATA 0 0 0 1 0 1 
+state_reg.STATE_PARITY 0 0 1 0 0 1 
+state_reg.STATE_STOP 0 1 0 0 0 1 
+state_reg.STATE_WAIT_STOP 1 0 0 0 0 1 
+
+State Machine - |AES_UART|AESCipher:aes_cipher_inst|StateReg
+Name StateReg.OUTPUT StateReg.S2 StateReg.S1 StateReg.S0 StateReg.KEY_GEN StateReg.IDLE 
+StateReg.IDLE 0 0 0 0 0 0 
+StateReg.KEY_GEN 0 0 0 0 1 1 
+StateReg.S0 0 0 0 1 0 1 
+StateReg.S1 0 0 1 0 0 1 
+StateReg.S2 0 1 0 0 0 1 
+StateReg.OUTPUT 1 0 0 0 0 1 
