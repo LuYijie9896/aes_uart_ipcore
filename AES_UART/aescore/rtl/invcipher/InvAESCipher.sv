@@ -1,3 +1,4 @@
+`resetall
 `timescale 1ns / 1ps
 `default_nettype none
 
@@ -10,6 +11,7 @@ module InvAESCipher(
 	input  wire logic         Clk,
     input  wire logic         Rst,
     input  wire logic         En,
+    input  wire logic         Idle,          // UART idle signal for zero-padding
     input  wire logic [1:0]   KeyLen,        // 00:128, 01:192, 10:256
 	input  wire logic [255:0] Key,           // Top alignment
     input  wire logic         KeyUpdate,     // Update pulse
@@ -145,6 +147,7 @@ module InvAESCipher(
 		case(StateReg)
             IDLE: begin
                 InByteCntNext = 4'd0;
+                DataInBufNext = '0;  // Clear buffer for new transaction
                 s_axis.tready = En;
                 if (s_axis.tvalid && En) begin
                     DataInBufNext[127 - (InByteCnt * 8) -: 8] = s_axis.tdata;
@@ -162,7 +165,36 @@ module InvAESCipher(
             // Collect the complete plaintext block
             INPUT: begin
                 s_axis.tready = 1'b1;
-                if (s_axis.tvalid) begin
+                
+                // Check for IDLE signal to trigger zero-padding
+                if (Idle && InByteCnt > 4'd0 && InByteCnt < 4'd16) begin
+                    // Pad remaining bytes with zeros using case statement for synthesis
+                    DNext = DataInBufNext;  // Start with current data
+                    
+                    // Use case to explicitly set padding for each possible byte count
+                    case (InByteCnt)
+                        4'd1:  DNext[119:0]   = 120'h0;  // Pad bytes 1-15
+                        4'd2:  DNext[111:0]   = 112'h0;  // Pad bytes 2-15
+                        4'd3:  DNext[103:0]   = 104'h0;  // Pad bytes 3-15
+                        4'd4:  DNext[95:0]    = 96'h0;   // Pad bytes 4-15
+                        4'd5:  DNext[87:0]    = 88'h0;   // Pad bytes 5-15
+                        4'd6:  DNext[79:0]    = 80'h0;   // Pad bytes 6-15
+                        4'd7:  DNext[71:0]    = 72'h0;   // Pad bytes 7-15
+                        4'd8:  DNext[63:0]    = 64'h0;   // Pad bytes 8-15
+                        4'd9:  DNext[55:0]    = 56'h0;   // Pad bytes 9-15
+                        4'd10: DNext[47:0]    = 48'h0;   // Pad bytes 10-15
+                        4'd11: DNext[39:0]    = 40'h0;   // Pad bytes 11-15
+                        4'd12: DNext[31:0]    = 32'h0;   // Pad bytes 12-15
+                        4'd13: DNext[23:0]    = 24'h0;   // Pad bytes 13-15
+                        4'd14: DNext[15:0]    = 16'h0;   // Pad bytes 14-15
+                        4'd15: DNext[7:0]     = 8'h0;    // Pad byte 15
+                        default: DNext = DataInBufNext;  // Shouldn't happen
+                    endcase
+                    
+                    StateNext = S0;  // Start decryption with padded data
+                end
+                // Normal byte reception
+                else if (s_axis.tvalid) begin
                     DataInBufNext[127 - (InByteCnt * 8) -: 8] = s_axis.tdata;
                     // Collection completed
                     if (InByteCnt == 4'd15) begin

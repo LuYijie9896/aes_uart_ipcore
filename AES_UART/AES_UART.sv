@@ -109,7 +109,8 @@ InvAESCipher inv_aes_cipher_inst(
 	.Clk            (Clk),
     .Rst            (Rst),
     .En             (cr1.aue & cr1.de),
-    .KeyLen         (cr1.dl),        
+    .Idle           (isr.idle),        // Connect UART idle signal for zero-padding
+	.KeyLen         (cr1.dl),        
 	.Key            ({dkr[7], dkr[6], dkr[5], dkr[4], dkr[3], dkr[2], dkr[1], dkr[0]}),           
     .KeyUpdate      (dkey_update),     
     .KeyLenUpdate   (dkey_len_update),  
