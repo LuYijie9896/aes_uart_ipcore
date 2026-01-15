@@ -1,0 +1,64 @@
+# ==========================================
+# Quartus Prime 忽略规则模板
+# ==========================================
+
+# 1. 编译中间数据库 (体积巨大，必须忽略)
+db/
+incremental_db/
+greybox_tmp/
+hc_output/
+/qdb/
+
+# 2. 编译输出文件 (报告、编程文件)
+# 如果你想在仓库里保存生成的固件(.sof)，可以用 # 注释掉下面这几行
+output_files/
+*.sof
+*.pof
+*.jam
+*.jbc
+*.ekp
+
+# 编译产生的报告和映射信息
+*.rpt
+*.summary
+*.ttxt
+*.jdi
+*.pin
+*.done
+*.smsg
+*.qmsg
+
+# 3. 仿真相关 (ModelSim/QuestaSim)
+# 整个 simulation 文件夹通常都是自动生成的
+simulation/
+*.vcd
+*.vwf
+*.wlf
+*.mpf
+# 自动生成的脚本 (如果你手写了 .do 脚本，请确保文件名不冲突或强制添加)
+*.do
+
+# 4. Quartus 产生的备份和临时文件
+*.bak
+*.orig
+*.qws
+*_description.txt
+
+# 5. Platform Designer (Qsys) / SOPC 生成的临时文件
+.qsys_edit/
+*_generation/
+*.sopcinfo
+*.html
+*.cmp
+
+# 6. Nios II / Eclipse 软件开发相关 (如果有软核)
+software/
+*.elf
+*.flash
+*.map
+*.obj
+*.o
+
+# 7. 操作系统产生的垃圾文件
+.DS_Store
+Thumbs.db
