@@ -1,1 +1,0 @@
-Warning (10268): Verilog HDL information at KeyExpander.sv(45): always construct contains both blocking and non-blocking assignments File: D:/GitHub_Repository/aes_uart_ipcore/AES_UART/aescore/rtl/common/KeyExpander.sv Line: 45
