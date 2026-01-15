@@ -18,6 +18,8 @@ output_files/
 *.jbc
 *.ekp
 
+*.qsf
+
 # 编译产生的报告和映射信息
 *.rpt
 *.summary
