@@ -3,7 +3,7 @@ module data_stream_sel_aes_rf (
     input  logic [1:0]wm,
     taxi_axis_if.snk s_axis,
     taxi_axis_if.src m0_axis, // to invcipher
-    taxi_axis_if.src m1_axis, // to others
+    taxi_axis_if.src m1_axis  // to others
 );
     always_comb begin
         if (wm == 2'b10 || (wm == 2'b00 && en == 1'b1)) begin

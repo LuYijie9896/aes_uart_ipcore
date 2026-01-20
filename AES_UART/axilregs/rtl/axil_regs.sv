@@ -218,8 +218,6 @@ module axil_regs #
                     ADDR_EPR4: reg_epr[3] <= s_axil_wr.wdata;
                 endcase
             end
-
-            if
         end
     end
 
