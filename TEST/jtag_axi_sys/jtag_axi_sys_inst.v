@@ -1,0 +1,44 @@
+	jtag_axi_sys u0 (
+		.axil_master_awid     (<connected-to-axil_master_awid>),     // axil_master.awid
+		.axil_master_awaddr   (<connected-to-axil_master_awaddr>),   //            .awaddr
+		.axil_master_awlen    (<connected-to-axil_master_awlen>),    //            .awlen
+		.axil_master_awsize   (<connected-to-axil_master_awsize>),   //            .awsize
+		.axil_master_awburst  (<connected-to-axil_master_awburst>),  //            .awburst
+		.axil_master_awlock   (<connected-to-axil_master_awlock>),   //            .awlock
+		.axil_master_awcache  (<connected-to-axil_master_awcache>),  //            .awcache
+		.axil_master_awprot   (<connected-to-axil_master_awprot>),   //            .awprot
+		.axil_master_awqos    (<connected-to-axil_master_awqos>),    //            .awqos
+		.axil_master_awregion (<connected-to-axil_master_awregion>), //            .awregion
+		.axil_master_awvalid  (<connected-to-axil_master_awvalid>),  //            .awvalid
+		.axil_master_awready  (<connected-to-axil_master_awready>),  //            .awready
+		.axil_master_wdata    (<connected-to-axil_master_wdata>),    //            .wdata
+		.axil_master_wstrb    (<connected-to-axil_master_wstrb>),    //            .wstrb
+		.axil_master_wlast    (<connected-to-axil_master_wlast>),    //            .wlast
+		.axil_master_wvalid   (<connected-to-axil_master_wvalid>),   //            .wvalid
+		.axil_master_wready   (<connected-to-axil_master_wready>),   //            .wready
+		.axil_master_bid      (<connected-to-axil_master_bid>),      //            .bid
+		.axil_master_bresp    (<connected-to-axil_master_bresp>),    //            .bresp
+		.axil_master_bvalid   (<connected-to-axil_master_bvalid>),   //            .bvalid
+		.axil_master_bready   (<connected-to-axil_master_bready>),   //            .bready
+		.axil_master_arid     (<connected-to-axil_master_arid>),     //            .arid
+		.axil_master_araddr   (<connected-to-axil_master_araddr>),   //            .araddr
+		.axil_master_arlen    (<connected-to-axil_master_arlen>),    //            .arlen
+		.axil_master_arsize   (<connected-to-axil_master_arsize>),   //            .arsize
+		.axil_master_arburst  (<connected-to-axil_master_arburst>),  //            .arburst
+		.axil_master_arlock   (<connected-to-axil_master_arlock>),   //            .arlock
+		.axil_master_arcache  (<connected-to-axil_master_arcache>),  //            .arcache
+		.axil_master_arprot   (<connected-to-axil_master_arprot>),   //            .arprot
+		.axil_master_arqos    (<connected-to-axil_master_arqos>),    //            .arqos
+		.axil_master_arregion (<connected-to-axil_master_arregion>), //            .arregion
+		.axil_master_arvalid  (<connected-to-axil_master_arvalid>),  //            .arvalid
+		.axil_master_arready  (<connected-to-axil_master_arready>),  //            .arready
+		.axil_master_rid      (<connected-to-axil_master_rid>),      //            .rid
+		.axil_master_rdata    (<connected-to-axil_master_rdata>),    //            .rdata
+		.axil_master_rresp    (<connected-to-axil_master_rresp>),    //            .rresp
+		.axil_master_rlast    (<connected-to-axil_master_rlast>),    //            .rlast
+		.axil_master_rvalid   (<connected-to-axil_master_rvalid>),   //            .rvalid
+		.axil_master_rready   (<connected-to-axil_master_rready>),   //            .rready
+		.clk_clk              (<connected-to-clk_clk>),              //         clk.clk
+		.reset_reset_n        (<connected-to-reset_reset_n>)         //       reset.reset_n
+	);
+
