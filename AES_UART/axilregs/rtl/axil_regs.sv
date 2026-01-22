@@ -188,8 +188,9 @@ module axil_regs #
                 case (wr_addr)
                     ADDR_CR1:  reg_cr1    <= s_axil_wr.wdata;
                     ADDR_CR2:  reg_cr2    <= s_axil_wr.wdata;
-                    ADDR_BRR:  reg_brr    <= s_axil_wr.wdata;
                     ADDR_ICR:  reg_icr    <= s_axil_wr.wdata;
+                    
+                    ADDR_BRR:  reg_brr    <= s_axil_wr.wdata;
 
                     ADDR_TDR:  reg_tdr    <= s_axil_wr.wdata;
 

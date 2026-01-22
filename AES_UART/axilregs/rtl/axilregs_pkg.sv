@@ -7,8 +7,8 @@ package axilregs_pkg;
     // Control Register 1 (CR1) - Offset 0x00
     // =========================================================================
     typedef struct packed {
-        logic [15:0] reserved;  // 31:16 保留
-        logic        wm;        // 15: 工作模式 (0:正常, 1:回环)
+        logic [14:0] reserved;  // 31:17 保留
+        logic [1:0]  wm;        // 16:15: 工作模式 (0:正常,01:,10:,11:回环)
         logic [1:0]  el;        // 14:13: 加密密钥长度 (00:128, 01:192, 10:256)
         logic [1:0]  dl;        // 12:11: 解密密钥长度
         logic [1:0]  wl;        // 10:9: 数据位长度

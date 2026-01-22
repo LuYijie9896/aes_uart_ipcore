@@ -44,11 +44,17 @@ taxi_axis_if #(.DATA_W(8)) fifo_rx_data_sel_axis_if();
 taxi_axis_if #(.DATA_W(8)) cipher_out_axis_if();
 taxi_axis_if #(.DATA_W(8)) invcipher_in_axis_if();
 
+taxi_axis_if #(.DATA_W(128)) cipher_in_axis_if();
+taxi_axis_if #(.DATA_W(128)) invcipher_out_axis_if();
+
 taxi_axis_if #(.DATA_W(8)) tdr_axis_if();
 taxi_axis_if #(.DATA_W(8)) rdr_axis_if();
 
 taxi_axis_if #(.DATA_W(128)) epr_axis_if();
 taxi_axis_if #(.DATA_W(128)) dpr_axis_if();
+
+taxi_axis_if #(.DATA_W(8)) rfsle_axis_if();
+taxi_axis_if #(.DATA_W(8)) tfsle_axis_if();
 
 // ISR Mapping
 assign isr.reserved = '0;
@@ -63,8 +69,8 @@ assign isr.txe      = 1'b0;
 assign isr.rxne     = 1'b0;
 
 // Looping mode
-assign rxd = cr1.wm ? txd  : Rx; 
-assign Tx  = cr1.wm ? 1'b1 : txd;  
+assign rxd = (cr1.wm == 2'b11) ? txd  : Rx; 
+assign Tx  = (cr1.wm == 2'b11) ? 1'b1 : txd;  
 
 axil_regs axil_regs_inst (
     .clk            (Clk),
@@ -92,6 +98,26 @@ axil_regs axil_regs_inst (
     .o_dkey_len_update  (dkey_len_update)
 );
 
+regs_aes_bridge regs_aes_bridge_inst(
+    .clk            (Clk),    
+    .rst            (Rst),  
+
+    .wm             (cr1.wm),
+    .ee             (cr1.ee),
+    .de             (cr1.de),
+    .idle           (isr.idle),
+
+    .s_axis_r_8     (tdr_axis_if.snk),          // from tdr
+    .s_axis_r_128   (epr_axis_if.snk),          // from epr
+    .m_axis_8       (tfsle_axis_if.src),        // to sel
+    .m_axis_128     (cipher_in_axis_if.src),    // to cipher
+
+    .m_axis_r_8     (rdr_axis_if.src),          // to rdr
+    .m_axis_r_128   (dpr_axis_if.src),          // to dpr
+    .s_axis_8       (rfsle_axis_if.snk),        // from sel
+    .s_axis_128     (invcipher_out_axis_if.snk) // from invcipher
+);
+
 AESCipher aes_cipher_inst(
 	.Clk            (Clk),
     .Rst            (Rst),
@@ -101,7 +127,7 @@ AESCipher aes_cipher_inst(
     .KeyUpdate      (ekey_update),     
     .KeyLenUpdate   (ekey_len_update),  
 
-    .s_axis         (epr_axis_if.snk),        
+    .s_axis         (cipher_in_axis_if.snk),        
     .m_axis         (cipher_out_axis_if.src)
 );
 
@@ -115,21 +141,23 @@ InvAESCipher inv_aes_cipher_inst(
     .KeyLenUpdate   (dkey_len_update),  
 
     .s_axis         (invcipher_in_axis_if.snk),        
-    .m_axis         (dpr_axis_if.src)
+    .m_axis         (invcipher_out_axis_if.src)
 );
 
-axis_mux_2to1 axis_mux_tx_inst(
-    .sel        (cr1.ee),
-    .s0_axis    (tdr_axis_if.snk),
-    .s1_axis    (cipher_out_axis_if.snk),
-    .m_axis     (fifo_tx_data_sel_axis_if.src)
+data_stream_sel_aes_tf data_stream_sel_aes_tf_inst(
+    .en             (cr1.ee),
+    .wm             (cr1.wm),
+    .s0_axis        (cipher_out_axis_if.snk),
+    .s1_axis        (tfsle_axis_if.snk),
+    .m_axis         (fifo_tx_data_sel_axis_if.src)
 );
 
-axis_demux_1to2 axis_demux_rx_inst(
-    .sel        (cr1.de),
-    .s_axis     (fifo_rx_data_sel_axis_if.snk),
-    .m0_axis    (rdr_axis_if.src),
-    .m1_axis    (invcipher_in_axis_if.src)
+data_stream_sel_aes_rf data_stream_sel_aes_rf_inst(
+    .en             (cr1.de),
+    .wm             (cr1.wm),
+    .s_axis         (fifo_rx_data_sel_axis_if.snk),
+    .m0_axis        (invcipher_in_axis_if.src),
+    .m1_axis        (rfsle_axis_if.src)
 );
 
 fifo #(.DEPTH(16)) fifo_tx_inst(
