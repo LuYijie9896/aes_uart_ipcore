@@ -506,7 +506,7 @@ module tb_AES_UART_modes;
                 $display("       [FAIL] Timeout waiting for UART Data.");
                 $stop;
             end
-        join_any
+        join
 
         // ---------------------------------------------------------------------
         // Test Case 6: Arbitrary Length Encryption (5 bytes)
