@@ -499,7 +499,7 @@ module tb_AES_UART_modes;
                 $display("       [FAIL] Timeout waiting for UART Data.");
                 $stop;
             end
-        join_any
+        join
 
         $display("\nAll Tests Completed.");
         $stop;
