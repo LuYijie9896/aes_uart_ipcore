@@ -38,7 +38,7 @@
 
 set_global_assignment -name FAMILY "Cyclone IV E"
 set_global_assignment -name DEVICE EP4CE115F29C7
-set_global_assignment -name TOP_LEVEL_ENTITY aes_uart_jtag_bridge
+set_global_assignment -name TOP_LEVEL_ENTITY AES_UART_wrapper
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 18.0.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "02:26:41  JANUARY 13, 2026"
 set_global_assignment -name LAST_QUARTUS_VERSION "18.0.0 Standard Edition"
@@ -65,13 +65,40 @@ set_global_assignment -name EDA_TEST_BENCH_FILE ../AES_UART/tb_AES_UART.sv -sect
 set_global_assignment -name EDA_TEST_BENCH_FILE ../AES_UART/tb_AES_UART_modes.sv -section_id tb_AES_UART_modes
 set_global_assignment -name VERILOG_INPUT_VERSION SYSTEMVERILOG_2005
 set_global_assignment -name VERILOG_SHOW_LMF_MAPPING_MESSAGES OFF
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_global_assignment -name VERILOG_FILE ../AES_UART/top_aes_uart_with_jtag.v
-set_global_assignment -name QIP_FILE aes_uart_jtag_bridge/synthesis/aes_uart_jtag_bridge.qip
 set_location_assignment PIN_Y2 -to clk_clk
 set_location_assignment PIN_M23 -to reset_reset_n
 set_location_assignment PIN_G12 -to uart_pins_rx
 set_location_assignment PIN_G9 -to uart_pins_tx
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/taxi_axil_if.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/taxi_axis_if.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/axilregs_pkg.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/xTimes.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/uart_tx.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/uart_rx.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/uart_brg.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/uart.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/SubBytes.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/ShiftRows.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/SBox.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/regs_aes_bridge.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/MixColumns.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/KeyExpander.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/InvSubBytes.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/InvShiftRows.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/InvSBox.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/InvMixColumns.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/InvAESRound.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/InvAESCipher.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/fifo.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/data_stream_sel_aes_tf.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/data_stream_sel_aes_rf.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/axil_regs.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/AESRound.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/AESCipher.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/AES_UART_wrapper.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/AES_UART.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../AES_UART/rtl_all/AddRoundKey.sv
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
