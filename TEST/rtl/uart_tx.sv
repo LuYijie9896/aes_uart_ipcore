@@ -47,7 +47,7 @@ logic busy_reg = 1'b0;
 logic tc_reg = 1'b0;
 
 logic [10:0] data_reg = 0; 
-logic [2:0]  baud_cnt_reg = 0; 
+logic [3:0]  baud_cnt_reg = 0; 
 logic [3:0]  bit_cnt_reg = 0;
 logic parity_bit = 1'b0;
 
@@ -86,7 +86,7 @@ always_ff @(posedge Clk) begin
             s_axis_tready_reg <= 1'b1;
             busy_reg <= 1'b1;
             txd_reg  <= 1'b0; // Transmit start bit            
-            baud_cnt_reg <= 3'd7; 
+            baud_cnt_reg <= 4'd8; 
             case(data_bits)
                 2'd1: begin // 7 data bits
                     data_reg <= parity_en ? {3'b111, parity_bit, s_axis.tdata[6:0]} : {4'b1111, s_axis.tdata[6:0]};
@@ -108,9 +108,9 @@ always_ff @(posedge Clk) begin
     end else begin
         if (bit_cnt_reg == 1 && stop_bits == 2'd1) begin
             // 1.5 stop bits special handling: shorten baud rate count to 4 cycles (4'd3) in the last cycle
-            baud_cnt_reg <= 3'd3;       
+            baud_cnt_reg <= 4'd4;       
         end else begin // Normal stop bit handling
-            baud_cnt_reg <= 3'd7;
+            baud_cnt_reg <= 4'd8;
         end
         // Shift and transmit
         {data_reg, txd_reg} <= {1'b1, data_reg};
