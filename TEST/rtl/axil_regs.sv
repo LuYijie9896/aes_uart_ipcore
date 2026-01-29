@@ -135,13 +135,42 @@ module axil_regs #
     logic s_axil_rvalid_reg = 1'b0, s_axil_rvalid_next;    
     logic [DATA_W-1:0] s_axil_rdata_reg = '0;
   
+    // =========================================================================
+    // AW/W 独立握手支持寄存器
+    // =========================================================================
+    // 根据 AXI-Lite 规范，AW（写地址）和 W（写数据）通道是独立的，
+    // Master 可以以任意顺序发送 AW 和 W，Slave 必须能够独立接收它们。
+    // 
+    // aw_received_reg: 标记 AW 通道是否已经成功接收（awvalid && awready 握手完成）
+    // w_received_reg:  标记 W 通道是否已经成功接收（wvalid && wready 握手完成）
+    // awaddr_latched:  锁存已接收的写地址，用于后续写操作
+    // wdata_latched:   锁存已接收的写数据，用于后续写操作
+    // =========================================================================
+    logic aw_received_reg = 1'b0, aw_received_next;
+    logic w_received_reg = 1'b0, w_received_next;
+    logic [7:0] awaddr_latched = '0;
+    logic [DATA_W-1:0] wdata_latched = '0;
 
     // 地址偏移
-    assign wr_addr = s_axil_wr.awaddr[7:0];
+    // 当 AW 已锁存时使用锁存地址，否则使用当前总线地址
+    assign wr_addr = aw_received_reg ? awaddr_latched : s_axil_wr.awaddr[7:0];
     assign rd_addr = s_axil_rd.araddr[7:0];
 
     // =========================================================================
-    // 4. 写通道逻辑
+    // 4. 写通道逻辑 (支持 AW/W 独立握手)
+    // =========================================================================
+    // 
+    // AXI-Lite 写事务时序说明：
+    // 场景1: AW 先到达
+    //   - 周期N:   awvalid=1, awready=1 → 锁存地址, aw_received=1
+    //   - 周期N+M: wvalid=1, wready=1   → 执行写操作, bvalid=1
+    // 
+    // 场景2: W 先到达
+    //   - 周期N:   wvalid=1, wready=1   → 锁存数据, w_received=1
+    //   - 周期N+M: awvalid=1, awready=1 → 执行写操作, bvalid=1
+    // 
+    // 场景3: AW 和 W 同时到达
+    //   - 周期N:   awvalid=1, wvalid=1, awready=1, wready=1 → 直接执行写操作, bvalid=1
     // =========================================================================
     
     // AXI 握手状态机
@@ -156,12 +185,56 @@ module axil_regs #
         s_axil_awready_next = 1'b0;
         s_axil_wready_next = 1'b0;
         s_axil_bvalid_next = s_axil_bvalid_reg && !s_axil_wr.bready;
+        aw_received_next = aw_received_reg;
+        w_received_next = w_received_reg;
 
-        if (s_axil_wr.awvalid && s_axil_wr.wvalid && (!s_axil_wr.bvalid || s_axil_wr.bready) && (!s_axil_wr.awready && !s_axil_wr.wready)) begin            
-            s_axil_awready_next = 1'b1;
-            s_axil_wready_next = 1'b1;
-            s_axil_bvalid_next = 1'b1;
-            mem_wr_en = 1'b1;
+        // =====================================================================
+        // AW 通道独立握手逻辑
+        // 条件：awvalid 有效，且 AW 尚未被接收，且当前没有未完成的 B 响应
+        // 新增：检查 awready 当前是否已经为高，防止拖尾
+        // =====================================================================
+        if (s_axil_wr.awvalid && !aw_received_reg && !s_axil_awready_reg && (!s_axil_bvalid_reg || s_axil_wr.bready)) begin
+            s_axil_awready_next = 1'b1;  // 拉高 awready 完成 AW 握手
+            
+            // 检查 W 通道状态来决定下一步动作
+            if (w_received_reg) begin
+                // W 已经提前到达并被锁存，现在 AW 也到了，可以执行写操作
+                mem_wr_en = 1'b1;
+                s_axil_bvalid_next = 1'b1;
+                aw_received_next = 1'b0;  // 清除 AW 接收标记
+                w_received_next = 1'b0;   // 清除 W 接收标记
+            end else if (s_axil_wr.wvalid) begin
+                // AW 和 W 同时到达，可以同时接收并执行写操作
+                s_axil_wready_next = 1'b1;
+                mem_wr_en = 1'b1;
+                s_axil_bvalid_next = 1'b1;
+                // 两个通道都是新接收的，无需设置 received 标记
+            end else begin
+                // 只有 AW 到达，锁存地址，等待 W
+                aw_received_next = 1'b1;
+            end
+        end
+
+        // =====================================================================
+        // W 通道独立握手逻辑
+        // 条件：wvalid 有效，且 W 尚未被接收，且当前没有未完成的 B 响应
+        // 注意：如果 AW 和 W 同时到达，上面的逻辑已经处理，这里只处理 W 单独到达的情况
+        // 新增：检查 wready 当前是否已经为高，防止拖尾
+        // =====================================================================
+        if (s_axil_wr.wvalid && !w_received_reg && !s_axil_wready_reg && (!s_axil_bvalid_reg || s_axil_wr.bready) && !s_axil_awready_next) begin
+            s_axil_wready_next = 1'b1;  // 拉高 wready 完成 W 握手
+            
+            // 检查 AW 通道状态来决定下一步动作
+            if (aw_received_reg) begin
+                // AW 已经提前到达并被锁存，现在 W 也到了，可以执行写操作
+                mem_wr_en = 1'b1;
+                s_axil_bvalid_next = 1'b1;
+                aw_received_next = 1'b0;  // 清除 AW 接收标记
+                w_received_next = 1'b0;   // 清除 W 接收标记
+            end else begin
+                // 只有 W 到达，锁存数据，等待 AW
+                w_received_next = 1'b1;
+            end
         end
     end
 
@@ -171,6 +244,10 @@ module axil_regs #
             s_axil_awready_reg <= 1'b0;
             s_axil_wready_reg  <= 1'b0;
             s_axil_bvalid_reg  <= 1'b0;
+            aw_received_reg    <= 1'b0;
+            w_received_reg     <= 1'b0;
+            awaddr_latched     <= '0;
+            wdata_latched      <= '0;
             reg_cr1 <= '0; 
             reg_cr2 <= '0; 
             reg_brr <= '0;
@@ -182,40 +259,72 @@ module axil_regs #
             s_axil_awready_reg <= s_axil_awready_next;
             s_axil_wready_reg  <= s_axil_wready_next;
             s_axil_bvalid_reg  <= s_axil_bvalid_next;
+            aw_received_reg    <= aw_received_next;
+            w_received_reg     <= w_received_next;
             reg_icr <= '0;
 
+            // =================================================================
+            // AW 通道地址锁存逻辑
+            // 当 AW 握手成功（awvalid && awready）且 W 尚未到达时，
+            // 锁存地址以供后续 W 到达时使用
+            // =================================================================
+            if (s_axil_awready_next && !w_received_reg && !s_axil_wr.wvalid) begin
+                awaddr_latched <= s_axil_wr.awaddr[7:0];
+            end
+
+            // =================================================================
+            // W 通道数据锁存逻辑
+            // 当 W 握手成功（wvalid && wready）且 AW 尚未到达时，
+            // 锁存数据以供后续 AW 到达时使用
+            // =================================================================
+            if (s_axil_wready_next && !aw_received_reg && !s_axil_wr.awvalid) begin
+                wdata_latched <= s_axil_wr.wdata;
+            end
+
+            // =================================================================
+            // 寄存器写入逻辑
+            // mem_wr_en 在以下情况被置位：
+            //   1. AW 和 W 同时到达
+            //   2. AW 先到达（已锁存），现在 W 到达
+            //   3. W 先到达（已锁存），现在 AW 到达
+            // 
+            // 写数据来源：
+            //   - 如果 W 是刚刚接收的（wready_next=1），使用总线上的 wdata
+            //   - 如果 W 是之前锁存的（w_received_reg=1），使用 wdata_latched
+            // =================================================================
             if (mem_wr_en) begin
                 case (wr_addr)
-                    ADDR_CR1:  reg_cr1    <= s_axil_wr.wdata;
-                    ADDR_CR2:  reg_cr2    <= s_axil_wr.wdata;
-                    ADDR_ICR:  reg_icr    <= s_axil_wr.wdata;
+                    // 写数据选择：优先使用当前总线数据，若 W 已锁存则使用锁存数据
+                    ADDR_CR1:  reg_cr1    <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_CR2:  reg_cr2    <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_ICR:  reg_icr    <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
                     
-                    ADDR_BRR:  reg_brr    <= s_axil_wr.wdata;
+                    ADDR_BRR:  reg_brr    <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
 
-                    ADDR_TDR:  reg_tdr    <= s_axil_wr.wdata;
+                    ADDR_TDR:  reg_tdr    <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
 
-                    ADDR_EKR1: reg_ekr[0] <= s_axil_wr.wdata;
-                    ADDR_EKR2: reg_ekr[1] <= s_axil_wr.wdata;
-                    ADDR_EKR3: reg_ekr[2] <= s_axil_wr.wdata;
-                    ADDR_EKR4: reg_ekr[3] <= s_axil_wr.wdata;
-                    ADDR_EKR5: reg_ekr[4] <= s_axil_wr.wdata;
-                    ADDR_EKR6: reg_ekr[5] <= s_axil_wr.wdata;
-                    ADDR_EKR7: reg_ekr[6] <= s_axil_wr.wdata;
-                    ADDR_EKR8: reg_ekr[7] <= s_axil_wr.wdata;
+                    ADDR_EKR1: reg_ekr[0] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_EKR2: reg_ekr[1] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_EKR3: reg_ekr[2] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_EKR4: reg_ekr[3] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_EKR5: reg_ekr[4] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_EKR6: reg_ekr[5] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_EKR7: reg_ekr[6] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_EKR8: reg_ekr[7] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
                     
-                    ADDR_DKR1: reg_dkr[0] <= s_axil_wr.wdata;
-                    ADDR_DKR2: reg_dkr[1] <= s_axil_wr.wdata;
-                    ADDR_DKR3: reg_dkr[2] <= s_axil_wr.wdata;
-                    ADDR_DKR4: reg_dkr[3] <= s_axil_wr.wdata;
-                    ADDR_DKR5: reg_dkr[4] <= s_axil_wr.wdata;
-                    ADDR_DKR6: reg_dkr[5] <= s_axil_wr.wdata;
-                    ADDR_DKR7: reg_dkr[6] <= s_axil_wr.wdata;
-                    ADDR_DKR8: reg_dkr[7] <= s_axil_wr.wdata;
+                    ADDR_DKR1: reg_dkr[0] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_DKR2: reg_dkr[1] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_DKR3: reg_dkr[2] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_DKR4: reg_dkr[3] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_DKR5: reg_dkr[4] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_DKR6: reg_dkr[5] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_DKR7: reg_dkr[6] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_DKR8: reg_dkr[7] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
                     
-                    ADDR_EPR1: reg_epr[0] <= s_axil_wr.wdata;
-                    ADDR_EPR2: reg_epr[1] <= s_axil_wr.wdata;
-                    ADDR_EPR3: reg_epr[2] <= s_axil_wr.wdata;
-                    ADDR_EPR4: reg_epr[3] <= s_axil_wr.wdata;
+                    ADDR_EPR1: reg_epr[0] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_EPR2: reg_epr[1] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_EPR3: reg_epr[2] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
+                    ADDR_EPR4: reg_epr[3] <= w_received_reg ? wdata_latched : s_axil_wr.wdata;
                 endcase
             end
         end
