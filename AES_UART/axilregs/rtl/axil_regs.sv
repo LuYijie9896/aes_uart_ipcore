@@ -191,8 +191,9 @@ module axil_regs #
         // =====================================================================
         // AW 通道独立握手逻辑
         // 条件：awvalid 有效，且 AW 尚未被接收，且当前没有未完成的 B 响应
+        // 新增：检查 awready 当前是否已经为高，防止拖尾
         // =====================================================================
-        if (s_axil_wr.awvalid && !aw_received_reg && (!s_axil_bvalid_reg || s_axil_wr.bready)) begin
+        if (s_axil_wr.awvalid && !aw_received_reg && !s_axil_awready_reg && (!s_axil_bvalid_reg || s_axil_wr.bready)) begin
             s_axil_awready_next = 1'b1;  // 拉高 awready 完成 AW 握手
             
             // 检查 W 通道状态来决定下一步动作
@@ -218,8 +219,9 @@ module axil_regs #
         // W 通道独立握手逻辑
         // 条件：wvalid 有效，且 W 尚未被接收，且当前没有未完成的 B 响应
         // 注意：如果 AW 和 W 同时到达，上面的逻辑已经处理，这里只处理 W 单独到达的情况
+        // 新增：检查 wready 当前是否已经为高，防止拖尾
         // =====================================================================
-        if (s_axil_wr.wvalid && !w_received_reg && (!s_axil_bvalid_reg || s_axil_wr.bready) && !s_axil_awready_next) begin
+        if (s_axil_wr.wvalid && !w_received_reg && !s_axil_wready_reg && (!s_axil_bvalid_reg || s_axil_wr.bready) && !s_axil_awready_next) begin
             s_axil_wready_next = 1'b1;  // 拉高 wready 完成 W 握手
             
             // 检查 AW 通道状态来决定下一步动作

@@ -150,11 +150,13 @@ module tb_AES_UART_modes;
                     s_axil_wvalid  <= 1'b0;
                     s_axil_wstrb   <= '0;
                 end
+                begin
+                    // 修复：等待 B 通道握手完成，然后立即拉低 bready
+                    wait(s_axil_bvalid && s_axil_bready);
+                    @(posedge Clk);
+                    s_axil_bready <= 1'b0;
+                end
             join
-
-            wait(s_axil_bvalid);
-            @(posedge Clk);
-            s_axil_bready <= 1'b0;
             @(posedge Clk);
         end
     endtask
